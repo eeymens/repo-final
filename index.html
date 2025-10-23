@@ -53,6 +53,13 @@
       background:#fff; color:#6b0000; padding:10px 14px; border-radius:10px; font-weight:700;
       box-shadow:0 8px 24px rgba(0,0,0,.3); display:none;
     }
+    /* müzik toggle */
+    #audioToggle{
+      position:fixed; right:14px; bottom:14px; z-index:1000;
+      background:rgba(246,242,233,.95); color:#7a0000; border-radius:999px;
+      padding:10px 14px; font-weight:700; box-shadow:0 10px 22px rgba(0,0,0,.25);
+      cursor:pointer; user-select:none;
+    }
   </style>
 </head>
 <body>
@@ -71,6 +78,10 @@
     <p class="footer">17.30 Akşam Yemeği – Bahçe • 18.00–19.00 Fotoğraf – Müze • 19.00–22.50 Balo – Yemekhane • 23.00 Yatakhane Girişi</p>
   </div>
 
+  <!-- Müzik (kökte music.mp3 varsa otomatik bağlanır) -->
+  <audio id="bgm" src="music.mp3" preload="auto" loop></audio>
+  <div id="audioToggle">🔈 Müzik: Kapalı</div>
+
   <div class="confetti" id="confetti"></div>
   <div class="error" id="err">Görsel yüklenemedi: invitation.jpg</div>
 
@@ -81,14 +92,40 @@
     const confetti = document.getElementById('confetti');
     const img = document.getElementById('inviteImage');
     const err = document.getElementById('err');
+    const bgm = document.getElementById('bgm');
+    const audioToggle = document.getElementById('audioToggle');
 
-    // görsel yüklenemezse uyarı göster
+    // görsel yüklenemezse uyarı
     img.addEventListener('error', () => { err.style.display = 'block'; });
 
-    function openInvite(){ card.classList.add('open'); confettiBurst(); }
+    // davetiye açılışı + konfeti + müzik
+    async function openInvite(){
+      card.classList.add('open');
+      try { 
+        if (bgm && bgm.src) {
+          await bgm.play();
+          audioToggle.textContent = "🔊 Müzik: Açık";
+        }
+      } catch(e){}
+      confettiBurst();
+      // 10 sn sonra konfetiyi durdur (opsiyonel)
+      setTimeout(()=> confetti.innerHTML = "", 10000);
+    }
+
     openBtn.addEventListener('click', openInvite);
     envelope.addEventListener('click', openInvite);
 
+    // müzik toggle
+    audioToggle.addEventListener('click', async () => {
+      if (!bgm || !bgm.src) return; // music.mp3 yoksa sessizce çık
+      if (bgm.paused) {
+        try { await bgm.play(); audioToggle.textContent = "🔊 Müzik: Açık"; } catch(e){}
+      } else {
+        bgm.pause(); audioToggle.textContent = "🔈 Müzik: Kapalı";
+      }
+    });
+
+    // konfeti üretici
     function confettiBurst(){
       confetti.innerHTML = "";
       const colors = ['#f6f2e9','#ffe5c7','#ffd8b0','#ffffff','#ffb48a'];
@@ -100,7 +137,9 @@
         piece.style.left = Math.random()*100+'vw';
         piece.style.width = size+'px';
         piece.style.height = size*1.4+'px';
-        piece.style.background = Math.random()>.45? colors[Math.floor(Math.random()*colors.length)] : reds[Math.floor(Math.random()*reds.length)];
+        piece.style.background = Math.random()>.45
+          ? colors[Math.floor(Math.random()*colors.length)]
+          : reds[Math.floor(Math.random()*reds.length)];
         piece.style.animationDelay = Math.random()*400+'ms';
         confetti.appendChild(piece);
       }
@@ -108,4 +147,3 @@
   </script>
 </body>
 </html>
-
