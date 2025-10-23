@@ -1,18 +1,19 @@
 <!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TEVİTOL • Cumhuriyet Balosu 2025</title>
-  <meta name="description" content="Animasyonlu dijital davetiye">
-  <meta name="theme-color" content="#8e0000">
+  <meta name="description" content="Animasyonlu dijital davetiye" />
+  <meta name="theme-color" content="#8e0000" />
   <style>
     :root{ --bg:#8e0000; --bg2:#5d0000; --paper:#f6f2e9; --text:#f6f2e9; }
     *{ box-sizing:border-box }
-    html,body{ height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; color:var(--text);
+    html,body{ height:100%; margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--text);
       background: radial-gradient(1200px 1200px at 10% 10%, var(--bg), var(--bg2)); }
     .wrap{ min-height:100%; display:grid; place-items:center; padding:24px; gap:14px }
     .card{ width:min(820px,96vw); aspect-ratio:3/4; position:relative; perspective:1200px }
+    /* zarf */
     .envelope{ position:absolute; inset:0; display:grid; place-items:center; border-radius:24px;
       background: linear-gradient(145deg,#b10505,#7a0000); box-shadow:0 20px 50px rgba(0,0,0,.35); overflow:hidden;
       transition: transform .8s cubic-bezier(.2,.7,.2,1), opacity .6s ease; }
@@ -27,16 +28,19 @@
       box-shadow:0 6px 0 rgba(0,0,0,.25), inset 0 4px 10px rgba(0,0,0,.25);
       display:grid; place-items:center; }
     .hint{ position:absolute; bottom:18px; left:0; right:0; text-align:center; font-size:14px; opacity:.9 }
+    /* davetiye (kağıt) */
     .paper{ position:absolute; inset:0; border-radius:22px; background:var(--paper); box-shadow:0 20px 50px rgba(0,0,0,.35);
       transform: rotateX(14deg) translateY(20px) scale(.98); transform-origin:50% 100%; overflow:hidden; opacity:0;
       transition: transform .9s cubic-bezier(.2,.8,.2,1), opacity .6s ease; }
     .paper img{ width:100%; height:100%; object-fit:cover; display:block }
+    /* open state */
     .open .envelope{ transform: translateY(30px) rotateX(-18deg) scale(.96); opacity:0; pointer-events:none }
     .open .paper{ transform: rotateX(0) translateY(0) scale(1); opacity:1 }
     .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center }
     button{ background:#f6f2e9; color:#7a0000; border:0; border-radius:999px; padding:10px 16px; font-weight:700; cursor:pointer }
     .footer{ text-align:center; opacity:.85; font-size:14px }
-    .confetti { position: fixed; inset:0; pointer-events:none; overflow:hidden }
+    /* konfeti */
+    .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
     .piece{ position:absolute; width:10px; height:14px; opacity:0; transform: translateY(-20vh) rotate(0);
       animation: fall 2600ms ease-in forwards; }
     @keyframes fall{
@@ -44,9 +48,11 @@
       8%{opacity:1}
       100%{opacity:1; transform: translateY(110vh) rotate(720deg)}
     }
-    .error{ position:fixed; left:50%; top:16px; transform:translateX(-50%);
+    .error{
+      position:fixed; left:50%; top:16px; transform:translateX(-50%);
       background:#fff; color:#6b0000; padding:10px 14px; border-radius:10px; font-weight:700;
-      box-shadow:0 8px 24px rgba(0,0,0,.3); display:none; }
+      box-shadow:0 8px 24px rgba(0,0,0,.3); display:none;
+    }
   </style>
 </head>
 <body>
@@ -57,30 +63,29 @@
         <div class="hint">Tıkla / dokun: Davetiye açılsın</div>
       </div>
       <div class="paper" id="paper" aria-hidden="true">
-        <img id="inviteImage" src="assets/invitation.jpg?v=1" alt="Cumhuriyet Balosu 2025 Davetiyesi">
+        <!-- GÖRSEL KÖKTE: invitation.jpg -->
+        <img id="inviteImage" src="invitation.jpg?v=3" alt="Cumhuriyet Balosu 2025 Davetiyesi" />
       </div>
     </div>
-    <div class="actions">
-      <button id="openBtn">Davetiyeyi Aç</button>
-    </div>
+    <div class="actions"><button id="openBtn">Davetiyeyi Aç</button></div>
     <p class="footer">17.30 Akşam Yemeği – Bahçe • 18.00–19.00 Fotoğraf – Müze • 19.00–22.50 Balo – Yemekhane • 23.00 Yatakhane Girişi</p>
   </div>
+
   <div class="confetti" id="confetti"></div>
-  <div class="error" id="err">Görsel yüklenemedi: assets/invitation.jpg</div>
+  <div class="error" id="err">Görsel yüklenemedi: invitation.jpg</div>
+
   <script>
     const card = document.getElementById('card');
     const openBtn = document.getElementById('openBtn');
     const envelope = document.getElementById('envelope');
     const confetti = document.getElementById('confetti');
-    const inviteImage = document.getElementById('inviteImage');
+    const img = document.getElementById('inviteImage');
     const err = document.getElementById('err');
 
-    inviteImage.addEventListener('error', () => { err.style.display = 'block'; });
+    // görsel yüklenemezse uyarı göster
+    img.addEventListener('error', () => { err.style.display = 'block'; });
 
-    function openInvite(){
-      card.classList.add('open');
-      confettiBurst();
-    }
+    function openInvite(){ card.classList.add('open'); confettiBurst(); }
     openBtn.addEventListener('click', openInvite);
     envelope.addEventListener('click', openInvite);
 
@@ -92,16 +97,15 @@
         const piece = document.createElement('div');
         piece.className = 'piece';
         const size = Math.random()*8+6;
-        const left = Math.random()*100;
-        const delay = Math.random()*400;
-        piece.style.left = left+'vw';
+        piece.style.left = Math.random()*100+'vw';
         piece.style.width = size+'px';
         piece.style.height = size*1.4+'px';
         piece.style.background = Math.random()>.45? colors[Math.floor(Math.random()*colors.length)] : reds[Math.floor(Math.random()*reds.length)];
-        piece.style.animationDelay = delay+'ms';
+        piece.style.animationDelay = Math.random()*400+'ms';
         confetti.appendChild(piece);
       }
     }
   </script>
 </body>
 </html>
+
