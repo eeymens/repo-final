@@ -13,7 +13,6 @@
       background: radial-gradient(1200px 1200px at 10% 10%, var(--bg), var(--bg2)); }
     .wrap{ min-height:100%; display:grid; place-items:center; padding:24px; gap:14px }
     .card{ width:min(820px,96vw); aspect-ratio:3/4; position:relative; perspective:1200px; cursor:pointer }
-    /* zarf */
     .envelope{ position:absolute; inset:0; display:grid; place-items:center; border-radius:24px;
       background: linear-gradient(145deg,#b10505,#7a0000); box-shadow:0 20px 50px rgba(0,0,0,.35); overflow:hidden;
       transition: transform .8s cubic-bezier(.2,.7,.2,1), opacity .6s ease; }
@@ -28,16 +27,13 @@
       box-shadow:0 6px 0 rgba(0,0,0,.25), inset 0 4px 10px rgba(0,0,0,.25);
       display:grid; place-items:center; }
     .hint{ position:absolute; bottom:18px; left:0; right:0; text-align:center; font-size:14px; opacity:.9 }
-    /* davetiye (kağıt) */
     .paper{ position:absolute; inset:0; border-radius:22px; background:var(--paper); box-shadow:0 20px 50px rgba(0,0,0,.35);
       transform: rotateX(14deg) translateY(20px) scale(.98); transform-origin:50% 100%; overflow:hidden; opacity:0;
       transition: transform .9s cubic-bezier(.2,.8,.2,1), opacity .6s ease; }
     .paper img{ width:100%; height:100%; object-fit:cover; display:block }
-    /* open state */
     .open .envelope{ transform: translateY(30px) rotateX(-18deg) scale(.96); opacity:0; pointer-events:none }
     .open .paper{ transform: rotateX(0) translateY(0) scale(1); opacity:1 }
     .footer{ text-align:center; opacity:.85; font-size:14px }
-    /* konfeti */
     .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
     .piece{ position:absolute; width:10px; height:14px; opacity:0; transform: translateY(-20vh) rotate(0);
       animation: fall 2600ms ease-in forwards; }
@@ -57,69 +53,4 @@
   <div class="wrap">
     <div class="card" id="card">
       <div class="envelope" id="envelope">
-        <div class="seal">🇹🇷</div>
-        <div class="hint">Açmak için tıkla 🎆</div>
-      </div>
-      <div class="paper" id="paper" aria-hidden="true">
-        <img id="inviteImage" src="invitation.jpg?v=6" alt="Cumhuriyet Balosu 2025 Davetiyesi" />
-      </div>
-    </div>
-    <p class="footer">17.30 Akşam Yemeği – Bahçe • 18.00–19.00 Fotoğraf – Müze • 19.00–22.50 Balo – Yemekhane • 23.00 Yatakhane Girişi</p>
-  </div>
-
-  <!-- Müzik: otomatik başlatma -->
-  <audio id="bgm" src="music.mp3" preload="auto" loop autoplay playsinline></audio>
-
-  <div class="confetti" id="confetti"></div>
-  <div class="error" id="err">Görsel yüklenemedi: invitation.jpg</div>
-
-  <script>
-    const card = document.getElementById('card');
-    const confetti = document.getElementById('confetti');
-    const img = document.getElementById('inviteImage');
-    const err = document.getElementById('err');
-    const bgm = document.getElementById('bgm');
-
-    // görsel yüklenemezse
-    img.addEventListener('error', () => { err.style.display = 'block'; });
-
-    function confettiBurst(){
-      confetti.innerHTML = "";
-      const colors = ['#f6f2e9','#ffe5c7','#ffd8b0','#ffffff','#ffb48a'];
-      const reds = ['#8e0000','#a00000','#c10000','#6e0000'];
-      for(let i=0;i<150;i++){
-        const piece = document.createElement('div');
-        piece.className = 'piece';
-        const size = Math.random()*8+6;
-        piece.style.left = Math.random()*100+'vw';
-        piece.style.width = size+'px';
-        piece.style.height = size*1.4+'px';
-        piece.style.background = Math.random()>.45
-          ? colors[Math.floor(Math.random()*colors.length)]
-          : reds[Math.floor(Math.random()*reds.length)];
-        piece.style.animationDelay = Math.random()*400+'ms';
-        confetti.appendChild(piece);
-      }
-    }
-
-    function openInvite(){
-      card.classList.add('open');
-      confettiBurst();
-      setTimeout(()=> confetti.innerHTML = "", 10000);
-    }
-
-    // herhangi bir yere tıklayınca davetiye açılır
-    card.addEventListener('click', openInvite);
-
-    // müziği zorla başlat (tarayıcı izin verirse)
-    async function startMusic(){
-      try { await bgm.play(); } catch(e) { /* izin verilmezse sessiz geç */ }
-    }
-    document.addEventListener('DOMContentLoaded', startMusic);
-    window.addEventListener('load', ()=> setTimeout(startMusic, 200));
-    document.addEventListener('visibilitychange', ()=>{
-      if (document.visibilityState === 'visible') setTimeout(startMusic, 150);
-    });
-  </script>
-</body>
-</html>
+        <div class="seal">🇹
