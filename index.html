@@ -12,7 +12,7 @@
     html,body{ height:100%; margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--text);
       background: radial-gradient(1200px 1200px at 10% 10%, var(--bg), var(--bg2)); }
     .wrap{ min-height:100%; display:grid; place-items:center; padding:24px; gap:14px }
-    .card{ width:min(820px,96vw); aspect-ratio:3/4; position:relative; perspective:1200px }
+    .card{ width:min(820px,96vw); aspect-ratio:3/4; position:relative; perspective:1200px; cursor:pointer }
     /* zarf */
     .envelope{ position:absolute; inset:0; display:grid; place-items:center; border-radius:24px;
       background: linear-gradient(145deg,#b10505,#7a0000); box-shadow:0 20px 50px rgba(0,0,0,.35); overflow:hidden;
@@ -36,8 +36,6 @@
     /* open state */
     .open .envelope{ transform: translateY(30px) rotateX(-18deg) scale(.96); opacity:0; pointer-events:none }
     .open .paper{ transform: rotateX(0) translateY(0) scale(1); opacity:1 }
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center }
-    button{ background:#f6f2e9; color:#7a0000; border:0; border-radius:999px; padding:10px 16px; font-weight:700; cursor:pointer }
     .footer{ text-align:center; opacity:.85; font-size:14px }
     /* konfeti */
     .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
@@ -53,79 +51,51 @@
       background:#fff; color:#6b0000; padding:10px 14px; border-radius:10px; font-weight:700;
       box-shadow:0 8px 24px rgba(0,0,0,.3); display:none;
     }
-    /* müzik toggle */
     #audioToggle{
       position:fixed; right:14px; bottom:14px; z-index:1000;
       background:rgba(246,242,233,.95); color:#7a0000; border-radius:999px;
       padding:10px 14px; font-weight:700; box-shadow:0 10px 22px rgba(0,0,0,.25);
       cursor:pointer; user-select:none;
     }
+    #bgm[controls]{ position:fixed; left:14px; bottom:14px; opacity:.2 }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card" id="card">
-      <div class="envelope" id="envelope" role="button" aria-label="Davetiyeyi aç">
+      <div class="envelope" id="envelope">
         <div class="seal">🇹🇷</div>
-        <div class="hint">Tıkla / dokun: Davetiye açılsın</div>
+        <div class="hint">Açmak için tıkla 🎆</div>
       </div>
       <div class="paper" id="paper" aria-hidden="true">
-        <!-- GÖRSEL KÖKTE: invitation.jpg -->
-        <img id="inviteImage" src="invitation.jpg?v=3" alt="Cumhuriyet Balosu 2025 Davetiyesi" />
+        <img id="inviteImage" src="invitation.jpg?v=5" alt="Cumhuriyet Balosu 2025 Davetiyesi" />
       </div>
     </div>
-    <div class="actions"><button id="openBtn">Davetiyeyi Aç</button></div>
     <p class="footer">17.30 Akşam Yemeği – Bahçe • 18.00–19.00 Fotoğraf – Müze • 19.00–22.50 Balo – Yemekhane • 23.00 Yatakhane Girişi</p>
   </div>
 
-  <!-- Müzik (kökte music.mp3 varsa otomatik bağlanır) -->
-  <audio id="bgm" src="music.mp3" preload="auto" loop></audio>
+  <!-- Müzik (sayfa yüklenince autoplay) -->
+  <audio id="bgm" src="music.mp3" preload="auto" loop playsinline></audio>
   <div id="audioToggle">🔈 Müzik: Kapalı</div>
 
   <div class="confetti" id="confetti"></div>
   <div class="error" id="err">Görsel yüklenemedi: invitation.jpg</div>
+  <div id="audioError" style="display:none;position:fixed;left:50%;top:60px;transform:translateX(-50%);background:#fff;color:#7a0000;padding:8px 12px;border-radius:10px;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.25)">
+    Müzik otomatik başlayamadı — “Müzik” butonuna dokunun.
+  </div>
 
   <script>
     const card = document.getElementById('card');
-    const openBtn = document.getElementById('openBtn');
     const envelope = document.getElementById('envelope');
     const confetti = document.getElementById('confetti');
     const img = document.getElementById('inviteImage');
     const err = document.getElementById('err');
     const bgm = document.getElementById('bgm');
     const audioToggle = document.getElementById('audioToggle');
+    const audioError = document.getElementById('audioError');
 
-    // görsel yüklenemezse uyarı
     img.addEventListener('error', () => { err.style.display = 'block'; });
 
-    // davetiye açılışı + konfeti + müzik
-    async function openInvite(){
-      card.classList.add('open');
-      try { 
-        if (bgm && bgm.src) {
-          await bgm.play();
-          audioToggle.textContent = "🔊 Müzik: Açık";
-        }
-      } catch(e){}
-      confettiBurst();
-      // 10 sn sonra konfetiyi durdur (opsiyonel)
-      setTimeout(()=> confetti.innerHTML = "", 10000);
-    }
-
-    openBtn.addEventListener('click', openInvite);
-    envelope.addEventListener('click', openInvite);
-
-    // müzik toggle
-    audioToggle.addEventListener('click', async () => {
-      if (!bgm || !bgm.src) return; // music.mp3 yoksa sessizce çık
-      if (bgm.paused) {
-        try { await bgm.play(); audioToggle.textContent = "🔊 Müzik: Açık"; } catch(e){}
-      } else {
-        bgm.pause(); audioToggle.textContent = "🔈 Müzik: Kapalı";
-      }
-    });
-
-    // konfeti üretici
     function confettiBurst(){
       confetti.innerHTML = "";
       const colors = ['#f6f2e9','#ffe5c7','#ffd8b0','#ffffff','#ffb48a'];
@@ -144,6 +114,39 @@
         confetti.appendChild(piece);
       }
     }
+
+    function openInvite(){
+      card.classList.add('open');
+      confettiBurst();
+      setTimeout(()=> confetti.innerHTML = "", 10000);
+    }
+
+    // her yere tıklayınca davetiye açılsın
+    card.addEventListener('click', openInvite);
+
+    // MÜZİK: otomatik başlatma denemesi
+    async function tryAutoplay(){
+      if (!bgm) return;
+      try {
+        await bgm.play();
+        audioToggle.textContent = "🔊 Müzik: Açık";
+        audioError.style.display = "none";
+      } catch(e){
+        audioError.style.display = "block";
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', tryAutoplay);
+    window.addEventListener('load', ()=> setTimeout(tryAutoplay, 200));
+    document.addEventListener('visibilitychange', ()=>{
+      if (document.visibilityState === 'visible') setTimeout(tryAutoplay, 150);
+    });
+
+    // Manuel müzik aç/kapat
+    audioToggle.addEventListener('click', async () => {
+      if (bgm.paused) { try { await bgm.play(); audioToggle.textContent = "🔊 Müzik: Açık"; audioError.style.display="none"; } catch(e){} }
+      else { bgm.pause(); audioToggle.textContent = "🔈 Müzik: Kapalı"; }
+    });
   </script>
 </body>
 </html>
